@@ -1,7 +1,7 @@
 :root {
-  color: #fff8e8;
-  background: #201633;
-  font-family: system-ui, sans-serif;
+  color: #fdf3ff;
+  background: #1c1233;
+  font-family: "Trebuchet MS", system-ui, sans-serif;
 }
 
 body {
@@ -9,6 +9,11 @@ body {
   min-height: 100vh;
   margin: 0;
   place-items: center;
+  background-image:
+    linear-gradient(rgba(94, 234, 212, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 234, 212, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% -20%, #3a2a63, #1c1233 60%);
+  background-size: 40px 40px, 40px 40px, 100% 100%;
 }
 
 main {
@@ -18,16 +23,20 @@ main {
 }
 
 h1 {
-  color: #ffcf5c;
+  color: #ff8fd6;
+  text-shadow: 2px 2px 0 #5eead4, -2px -2px 0 #6c4bd6;
+  letter-spacing: 0.05em;
 }
 
 canvas {
   display: block;
   width: 100%;
-  border: 4px solid #ffcf5c;
-  border-radius: 8px;
+  border: 4px solid #ff8fd6;
+  border-radius: 12px;
   background: #67c6e3;
+  box-shadow: 0 0 24px rgba(255, 143, 214, 0.35);
   image-rendering: pixelated;
+  cursor: pointer;
 }
 
 .controls {
@@ -46,9 +55,9 @@ canvas {
 button {
   min-width: 4.5rem;
   min-height: 3.5rem;
-  border: 2px solid #ffcf5c;
+  border: 2px solid #ff8fd6;
   border-radius: 0.75rem;
-  color: #201633;
+  color: #1c1233;
   background: #ffcf5c;
   font: inherit;
   font-size: 1.2rem;
@@ -58,6 +67,17 @@ button {
 
 button:active {
   transform: scale(0.95);
+}
+
+.music-toggle {
+  margin-top: 1rem;
+  min-width: auto;
+  min-height: auto;
+  padding: 0.5rem 1.25rem;
+  background: #5eead4;
+  border-color: #5eead4;
+  color: #1c1233;
+  touch-action: auto;
 }
 
 @media (max-width: 480px) {
