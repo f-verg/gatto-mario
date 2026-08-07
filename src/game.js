@@ -5,9 +5,13 @@ const GRAVITY = 1500;
 
 export const LEVELS = [
   {
+    platforms: [
+      { x: 180, y: 350, width: 150, height: 18 },
+      { x: 520, y: 300, width: 160, height: 18 },
+    ],
     items: [
-      { type: "bread", x: 320, y: GROUND - 28, width: 28, height: 28 },
-      { type: "taco", x: 560, y: GROUND - 28, width: 28, height: 28 },
+      { type: "bread", x: 240, y: 322, width: 28, height: 28 },
+      { type: "taco", x: 580, y: 272, width: 28, height: 28 },
       { type: "profiterole", x: 800, y: GROUND - 28, width: 28, height: 28 },
     ],
     enemies: [
@@ -17,9 +21,14 @@ export const LEVELS = [
     ],
   },
   {
+    platforms: [
+      { x: 110, y: 330, width: 180, height: 18 },
+      { x: 410, y: 380, width: 150, height: 18 },
+      { x: 690, y: 290, width: 160, height: 18 },
+    ],
     items: [
-      { type: "taco", x: 260, y: GROUND - 28, width: 28, height: 28 },
-      { type: "profiterole", x: 700, y: GROUND - 28, width: 28, height: 28 },
+      { type: "taco", x: 180, y: 302, width: 28, height: 28 },
+      { type: "profiterole", x: 760, y: 262, width: 28, height: 28 },
     ],
     enemies: [
       { type: "chicken", x: 300, y: GROUND - 36, width: 36, height: 36, vx: -110 },
@@ -29,7 +38,12 @@ export const LEVELS = [
     ],
   },
   {
-    items: [{ type: "bread", x: 480, y: GROUND - 28, width: 28, height: 28 }],
+    platforms: [
+      { x: 230, y: 360, width: 140, height: 18 },
+      { x: 440, y: 280, width: 160, height: 18 },
+      { x: 700, y: 360, width: 150, height: 18 },
+    ],
+    items: [{ type: "bread", x: 505, y: 252, width: 28, height: 28 }],
     enemies: [
       { type: "coffee", x: 220, y: GROUND - 36, width: 36, height: 36, vx: 120 },
       { type: "furry", x: 420, y: GROUND - 36, width: 36, height: 36, vx: -140 },
@@ -58,6 +72,7 @@ export class Game {
   loadLevel(index) {
     const level = LEVELS[index];
     this.items = cloneEntities(level.items);
+    this.platforms = cloneEntities(level.platforms);
     this.enemies = cloneEntities(level.enemies);
     this.player.x = 100;
     this.player.y = GROUND - this.player.height;
@@ -80,11 +95,25 @@ export class Game {
     const player = this.player;
     player.vx = (input.left ? -220 : 0) + (input.right ? 220 : 0);
     if (player.vx) player.facing = Math.sign(player.vx);
-    if (input.jump && player.y + player.height >= GROUND) player.vy = -570;
+    if (input.jump && this.isStanding(player)) player.vy = -570;
+    const previousBottom = player.y + player.height;
     player.vy += GRAVITY * dt;
     player.x = Math.max(0, Math.min(WIDTH - player.width, player.x + player.vx * dt));
     player.y = Math.min(GROUND - player.height, player.y + player.vy * dt);
-    if (player.y + player.height >= GROUND) player.vy = 0;
+    const platform = this.platforms.find(
+      (candidate) =>
+        player.vy >= 0 &&
+        previousBottom <= candidate.y &&
+        player.y + player.height >= candidate.y &&
+        player.x + player.width > candidate.x &&
+        player.x < candidate.x + candidate.width
+    );
+    if (platform) {
+      player.y = platform.y - player.height;
+      player.vy = 0;
+    } else if (player.y + player.height >= GROUND) {
+      player.vy = 0;
+    }
 
     this.enemies.forEach((enemy) => {
       enemy.x += enemy.vx * dt;
@@ -96,8 +125,17 @@ export class Game {
     const hadEnemies = this.enemies.length > 0;
     this.enemies = this.enemies.filter((enemy) => {
       const hit = this.projectiles.some((projectile) => this.collides(projectile, enemy));
-      if (hit) this.score += 100;
-      return !hit;
+      const stomped =
+        player.vy >= 0 &&
+        previousBottom <= enemy.y + 10 &&
+        player.y + player.height >= enemy.y &&
+        player.x + player.width > enemy.x &&
+        player.x < enemy.x + enemy.width;
+      if (hit || stomped) {
+        this.score += stomped ? 150 : 100;
+        if (stomped) player.vy = -360;
+      }
+      return !hit && !stomped;
     });
     if (this.invincible <= 0 && this.enemies.some((enemy) => this.collides(player, enemy))) this.hurt();
     if (hadEnemies && this.enemies.length === 0 && !this.gameOver) this.advanceLevel();
@@ -138,6 +176,18 @@ export class Game {
     this.player.y = GROUND - this.player.height;
     this.player.vy = 0;
     this.invincible = 1;
+  }
+
+  isStanding(player) {
+    return (
+      player.y + player.height >= GROUND ||
+      this.platforms.some(
+        (platform) =>
+          player.y + player.height === platform.y &&
+          player.x + player.width > platform.x &&
+          player.x < platform.x + platform.width
+      )
+    );
   }
 
   collides(a, b) {

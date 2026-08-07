@@ -37,24 +37,10 @@ canvas {
   box-shadow: 0 0 24px rgba(255, 143, 214, 0.35);
   image-rendering: pixelated;
   cursor: pointer;
-}
-
-.controls {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.movement-controls,
-.action-controls {
-  display: flex;
-  gap: 0.5rem;
+  touch-action: none;
 }
 
 button {
-  min-width: 4.5rem;
-  min-height: 3.5rem;
   border: 2px solid #ff8fd6;
   border-radius: 0.75rem;
   color: #1c1233;
@@ -62,7 +48,6 @@ button {
   font: inherit;
   font-size: 1.2rem;
   font-weight: 700;
-  touch-action: none;
 }
 
 button:active {
@@ -89,13 +74,4 @@ button:active {
     margin: 0.5rem 0;
   }
 
-  .controls {
-    gap: 0.5rem;
-  }
-
-  button {
-    min-width: 3.75rem;
-    min-height: 3.25rem;
-    font-size: 1rem;
-  }
 }

@@ -5,6 +5,7 @@ const context = canvas.getContext("2d");
 const musicButton = document.querySelector("#music-toggle");
 let game = new Game();
 const pressed = new Set();
+const touch = { pointerId: null, startX: 0, startY: 0, direction: null, jump: false };
 let previous;
 
 const CONTROL_KEYS = new Set([
@@ -28,24 +29,40 @@ addEventListener("keydown", (event) => {
 });
 addEventListener("keyup", (event) => pressed.delete(event.key.toLowerCase()));
 
-document.querySelectorAll("[data-action]").forEach((button) => {
-  const { action } = button.dataset;
-  button.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    button.setPointerCapture(event.pointerId);
-    startMusic();
-    if (action === "shoot") {
-      game.shoot();
-    } else {
-      pressed.add(action);
-    }
-  });
-  if (action !== "shoot") button.addEventListener("lostpointercapture", () => pressed.delete(action));
+canvas.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  startMusic();
+  if (game.gameOver) {
+    restart();
+    return;
+  }
+  touch.pointerId = event.pointerId;
+  touch.startX = event.clientX;
+  touch.startY = event.clientY;
+  canvas.setPointerCapture(event.pointerId);
 });
 
-canvas.addEventListener("pointerdown", () => {
-  startMusic();
-  if (game.gameOver) restart();
+canvas.addEventListener("pointermove", (event) => {
+  if (event.pointerId !== touch.pointerId) return;
+  const dx = event.clientX - touch.startX;
+  const dy = event.clientY - touch.startY;
+  if (Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy)) touch.direction = dx > 0 ? "right" : "left";
+});
+
+canvas.addEventListener("pointerup", (event) => {
+  if (event.pointerId !== touch.pointerId) return;
+  const dy = event.clientY - touch.startY;
+  if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(event.clientX - touch.startX)) {
+    if (dy < 0) touch.jump = true;
+    else game.shoot();
+  }
+  touch.pointerId = null;
+  touch.direction = null;
+});
+
+canvas.addEventListener("pointercancel", () => {
+  touch.pointerId = null;
+  touch.direction = null;
 });
 
 function restart() {
@@ -53,10 +70,12 @@ function restart() {
 }
 
 function input() {
+  const jump = pressed.has(" ") || pressed.has("arrowup") || pressed.has("w") || touch.jump;
+  touch.jump = false;
   return {
-    left: pressed.has("arrowleft") || pressed.has("a") || pressed.has("left"),
-    right: pressed.has("arrowright") || pressed.has("d") || pressed.has("right"),
-    jump: pressed.has(" ") || pressed.has("arrowup") || pressed.has("w") || pressed.has("jump"),
+    left: pressed.has("arrowleft") || pressed.has("a") || touch.direction === "left",
+    right: pressed.has("arrowright") || pressed.has("d") || touch.direction === "right",
+    jump,
   };
 }
 
@@ -80,6 +99,32 @@ function drawGrid() {
     context.lineTo(WIDTH, y);
     context.stroke();
   }
+}
+
+function drawBackground() {
+  context.fillStyle = "rgba(255, 255, 255, 0.65)";
+  [[120, 110], [420, 170], [760, 95]].forEach(([x, y]) => {
+    context.beginPath();
+    context.arc(x, y, 22, 0, Math.PI * 2);
+    context.arc(x + 28, y - 10, 28, 0, Math.PI * 2);
+    context.arc(x + 62, y, 20, 0, Math.PI * 2);
+    context.fill();
+  });
+  context.fillStyle = "#76c85a";
+  context.beginPath();
+  context.arc(120, GROUND + 20, 150, Math.PI, 0);
+  context.arc(500, GROUND + 35, 190, Math.PI, 0);
+  context.arc(860, GROUND + 25, 140, Math.PI, 0);
+  context.fill();
+}
+
+function drawPlatform(platform) {
+  context.fillStyle = "#8d5a34";
+  context.fillRect(platform.x, platform.y, platform.width, platform.height);
+  context.fillStyle = "#d7a765";
+  context.fillRect(platform.x, platform.y, platform.width, 5);
+  context.fillStyle = "rgba(32, 22, 51, 0.2)";
+  context.fillRect(platform.x + 8, platform.y + 9, platform.width - 16, 3);
 }
 
 function drawCat(entity, color) {
@@ -236,15 +281,19 @@ function draw() {
   skyGradient.addColorStop(1, "#a6e6f5");
   context.fillStyle = skyGradient;
   context.fillRect(0, 0, WIDTH, GROUND);
+  drawBackground();
   drawGrid();
   context.fillStyle = "#8ad64b";
   context.fillRect(0, GROUND, WIDTH, HEIGHT - GROUND);
 
+  game.platforms.forEach(drawPlatform);
   game.items.forEach(drawItem);
   game.enemies.forEach(drawEnemy);
   game.projectiles.forEach(drawProjectile);
-  drawCat(game.player, PLAYER_COLORS[game.player.power] ?? "#ffb3c6");
+  if (game.invincible === 0 || Math.floor(game.invincible * 12) % 2 === 0) drawCat(game.player, PLAYER_COLORS[game.player.power] ?? "#ffb3c6");
 
+  context.fillStyle = "rgba(255, 255, 255, 0.78)";
+  context.fillRect(12, 12, 630, 34);
   context.fillStyle = "#201633";
   context.font = "20px system-ui";
   context.fillText(

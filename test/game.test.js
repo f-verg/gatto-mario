@@ -52,6 +52,33 @@ test("Mario is briefly invincible after enemy contact", () => {
   assert.ok(game.invincible > 0);
 });
 
+test("Mario can land on platforms and stomp enemies for bonus points", () => {
+  const game = new Game();
+  const platform = game.platforms[0];
+  game.player.x = platform.x;
+  game.player.y = platform.y - game.player.height - 20;
+  game.player.vy = 100;
+
+  game.update(0.1);
+
+  assert.equal(game.player.y, platform.y - game.player.height);
+  assert.equal(game.player.vy, 0);
+
+  game.platforms = [];
+  game.player.x = 500;
+  game.player.y = 400;
+  game.player.vy = 200;
+  game.enemies = [
+    { type: "chicken", x: 500, y: 440, width: 36, height: 36, vx: 0 },
+    { type: "coffee", x: 800, y: 434, width: 36, height: 36, vx: 0 },
+  ];
+  game.update(0.05);
+
+  assert.equal(game.enemies.length, 1);
+  assert.equal(game.score, 150);
+  assert.ok(game.player.vy < 0);
+});
+
 test("clearing all enemies advances to the next level", () => {
   const game = new Game();
   assert.equal(game.level, 0);
