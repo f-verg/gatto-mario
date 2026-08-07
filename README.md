@@ -20,3 +20,16 @@ i pulsanti sotto il gioco.
 ```sh
 npm test
 ```
+
+## Deploy
+
+Il gioco viene pubblicato su Azure Static Web Apps tramite GitHub Actions
+(`.github/workflows/azure-static-web-apps-ashy-coast-0f16e1c03.yml`).
+
+Il deploy usa il secret `AZURE_STATIC_WEB_APPS_API_TOKEN_ASHY_COAST_0F16E1C03`.
+Questo token di deployment cambia quando l'app viene spostata tra resource group
+o subscription: in quel caso aggiorna il valore del secret con il nuovo
+deployment token (dal portale Azure, sezione **Manage deployment token** della
+Static Web App). Se il secret manca, il workflow salta il deploy invece di
+fallire.
+
