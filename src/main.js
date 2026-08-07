@@ -4,7 +4,7 @@ const canvas = document.querySelector("#game");
 const context = canvas.getContext("2d");
 const game = new Game();
 const pressed = new Set();
-let previous = 0;
+let previous;
 
 addEventListener("keydown", (event) => {
   pressed.add(event.key.toLowerCase());
@@ -48,7 +48,7 @@ function draw() {
 }
 
 function frame(time) {
-  game.update(Math.min((time - previous) / 1000, 0.05), input());
+  if (previous !== undefined) game.update(Math.min((time - previous) / 1000, 0.05), input());
   previous = time;
   draw();
   if (!game.gameOver) requestAnimationFrame(frame);

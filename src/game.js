@@ -46,7 +46,7 @@ export class Game {
       if (hit) this.score += 100;
       return !hit;
     });
-    if (!this.invincible && this.enemies.some((enemy) => this.collides(player, enemy))) this.hurt();
+    if (this.invincible <= 0 && this.enemies.some((enemy) => this.collides(player, enemy))) this.hurt();
   }
 
   collect(item) {
