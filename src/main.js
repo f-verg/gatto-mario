@@ -23,9 +23,7 @@ document.querySelectorAll("[data-action]").forEach((button) => {
       pressed.add(action);
     }
   });
-  ["pointerup", "pointercancel", "lostpointercapture"].forEach((eventName) =>
-    button.addEventListener(eventName, () => pressed.delete(action)),
-  );
+  button.addEventListener("lostpointercapture", () => pressed.delete(action));
 });
 
 function input() {
