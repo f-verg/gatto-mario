@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Game } from "../src/game.js";
+import { Game, LEVELS } from "../src/game.js";
 
 test("bread grants Mario an extra life and fat power", () => {
   const game = new Game();
@@ -50,4 +50,30 @@ test("Mario is briefly invincible after enemy contact", () => {
 
   assert.equal(game.player.lives, 2);
   assert.ok(game.invincible > 0);
+});
+
+test("clearing all enemies advances to the next level", () => {
+  const game = new Game();
+  assert.equal(game.level, 0);
+
+  game.enemies = [{ type: "chicken", x: 500, y: 0, width: 36, height: 36, vx: 0 }];
+  game.projectiles = [{ x: 500, y: 0, width: 12, height: 12, vx: 0, type: "bean" }];
+  game.update(0);
+
+  assert.equal(game.level, 1);
+  assert.equal(game.gameOver, false);
+  assert.equal(game.enemies.length, LEVELS[1].enemies.length);
+});
+
+test("clearing the final level ends the game in victory", () => {
+  const game = new Game();
+  game.level = LEVELS.length - 1;
+  game.loadLevel(game.level);
+
+  game.enemies = [{ type: "chicken", x: 500, y: 0, width: 36, height: 36, vx: 0 }];
+  game.projectiles = [{ x: 500, y: 0, width: 12, height: 12, vx: 0, type: "bean" }];
+  game.update(0);
+
+  assert.equal(game.gameOver, true);
+  assert.equal(game.won, true);
 });
