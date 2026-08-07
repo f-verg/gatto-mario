@@ -29,3 +29,53 @@ canvas {
   background: #67c6e3;
   image-rendering: pixelated;
 }
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.movement-controls,
+.action-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  min-width: 4.5rem;
+  min-height: 3.5rem;
+  border: 2px solid #ffcf5c;
+  border-radius: 0.75rem;
+  color: #201633;
+  background: #ffcf5c;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  touch-action: none;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 0.5rem;
+  }
+
+  h1 {
+    margin: 0.5rem 0;
+  }
+
+  .controls {
+    gap: 0.5rem;
+  }
+
+  button {
+    min-width: 3.75rem;
+    min-height: 3.25rem;
+    font-size: 1rem;
+  }
+}

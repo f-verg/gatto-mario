@@ -12,11 +12,27 @@ addEventListener("keydown", (event) => {
 });
 addEventListener("keyup", (event) => pressed.delete(event.key.toLowerCase()));
 
+document.querySelectorAll("[data-action]").forEach((button) => {
+  const { action } = button.dataset;
+  button.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    button.setPointerCapture(event.pointerId);
+    if (action === "shoot") {
+      game.shoot();
+    } else {
+      pressed.add(action);
+    }
+  });
+  ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) =>
+    button.addEventListener(eventName, () => pressed.delete(action)),
+  );
+});
+
 function input() {
   return {
-    left: pressed.has("arrowleft") || pressed.has("a"),
-    right: pressed.has("arrowright") || pressed.has("d"),
-    jump: pressed.has(" ") || pressed.has("arrowup") || pressed.has("w"),
+    left: pressed.has("arrowleft") || pressed.has("a") || pressed.has("left"),
+    right: pressed.has("arrowright") || pressed.has("d") || pressed.has("right"),
+    jump: pressed.has(" ") || pressed.has("arrowup") || pressed.has("w") || pressed.has("jump"),
   };
 }
 

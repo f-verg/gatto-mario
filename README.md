@@ -7,8 +7,9 @@ di caffè e palline pelose.
 
 Apri `index.html` nel browser.
 
-Muoviti con **← →** oppure **A D**, salta con **Spazio** e usa **X** per
-sparare dopo aver raccolto un taco o un profiterole.
+Su desktop muoviti con **← →** oppure **A D**, salta con **Spazio** e usa
+**X** per sparare dopo aver raccolto un taco o un profiterole. Su mobile usa
+i pulsanti sotto il gioco.
 
 - Il pane aggiunge una vita e rende Mario più grasso.
 - Il taco dà un sombrero e permette di sparare fagioli.
