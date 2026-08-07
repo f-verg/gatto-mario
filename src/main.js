@@ -1,0 +1,56 @@
+import { Game, HEIGHT, WIDTH } from "./game.js";
+
+const canvas = document.querySelector("#game");
+const context = canvas.getContext("2d");
+const game = new Game();
+const pressed = new Set();
+let previous = 0;
+
+addEventListener("keydown", (event) => {
+  pressed.add(event.key.toLowerCase());
+  if (event.key.toLowerCase() === "x" && !event.repeat) game.shoot();
+});
+addEventListener("keyup", (event) => pressed.delete(event.key.toLowerCase()));
+
+function input() {
+  return {
+    left: pressed.has("arrowleft") || pressed.has("a"),
+    right: pressed.has("arrowright") || pressed.has("d"),
+    jump: pressed.has(" ") || pressed.has("arrowup") || pressed.has("w"),
+  };
+}
+
+function rectangle(entity, color) {
+  context.fillStyle = color;
+  context.fillRect(entity.x, entity.y, entity.width, entity.height);
+}
+
+function draw() {
+  context.clearRect(0, 0, WIDTH, HEIGHT);
+  context.fillStyle = "#8ad64b";
+  context.fillRect(0, 470, WIDTH, 70);
+  rectangle(game.player, game.player.power === "taco" ? "#ef4d40" : "#f5a4a4");
+  if (game.player.power === "taco") {
+    context.fillStyle = "#f6d365";
+    context.fillRect(game.player.x + 4, game.player.y - 8, 36, 12);
+  }
+  const colors = { bread: "#f4cf8b", taco: "#efb650", profiterole: "#71452e", chicken: "#fff", coffee: "#633c2a", furry: "#b875e8", bean: "#442b1d", poop: "#6c452a" };
+  [...game.items, ...game.enemies, ...game.projectiles].forEach((entity) => rectangle(entity, colors[entity.type]));
+  context.fillStyle = "#201633";
+  context.font = "20px system-ui";
+  context.fillText(`Vite: ${game.player.lives}   Punti: ${game.score}   Potere: ${game.player.power ?? "nessuno"}`, 20, 35);
+  if (game.gameOver) {
+    context.fillStyle = "#201633";
+    context.font = "bold 48px system-ui";
+    context.fillText("Game over", 360, 230);
+  }
+}
+
+function frame(time) {
+  game.update(Math.min((time - previous) / 1000, 0.05), input());
+  previous = time;
+  draw();
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
