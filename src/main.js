@@ -6,9 +6,22 @@ const game = new Game();
 const pressed = new Set();
 let previous;
 
+const CONTROL_KEYS = new Set([
+  "arrowup",
+  "arrowdown",
+  "arrowleft",
+  "arrowright",
+  "a",
+  "d",
+  " ",
+  "x",
+]);
+
 addEventListener("keydown", (event) => {
-  pressed.add(event.key.toLowerCase());
-  if (event.key.toLowerCase() === "x" && !event.repeat) game.shoot();
+  const key = event.key.toLowerCase();
+  if (CONTROL_KEYS.has(key)) event.preventDefault();
+  pressed.add(key);
+  if (key === "x" && !event.repeat) game.shoot();
 });
 addEventListener("keyup", (event) => pressed.delete(event.key.toLowerCase()));
 
