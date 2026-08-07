@@ -22,9 +22,11 @@ test("taco shoots beans forward and profiteroles shoot backward", () => {
   assert.ok(game.projectiles[0].vx > 0);
 
   game.collect({ type: "profiterole" });
-  game.shoot();
-  assert.equal(game.projectiles[1].type, "poop");
-  assert.ok(game.projectiles[1].vx < 0);
+  game.projectiles = [];
+  game.player.facing = 1;
+  assert.equal(game.shoot(), true);
+  assert.equal(game.projectiles[0].type, "poop");
+  assert.ok(game.projectiles[0].vx < 0);
 });
 
 test("Mario loses a life on contact and ends the game without lives", () => {
@@ -37,4 +39,15 @@ test("Mario loses a life on contact and ends the game without lives", () => {
   game.hurt();
   game.hurt();
   assert.equal(game.gameOver, true);
+});
+
+test("Mario is briefly invincible after enemy contact", () => {
+  const game = new Game();
+  game.enemies = [{ x: game.player.x, y: game.player.y, width: 36, height: 36, vx: 0 }];
+
+  game.update(0);
+  game.update(0.5);
+
+  assert.equal(game.player.lives, 2);
+  assert.ok(game.invincible > 0);
 });

@@ -29,7 +29,8 @@ function draw() {
   context.clearRect(0, 0, WIDTH, HEIGHT);
   context.fillStyle = "#8ad64b";
   context.fillRect(0, 470, WIDTH, 70);
-  rectangle(game.player, game.player.power === "taco" ? "#ef4d40" : "#f5a4a4");
+  const playerColors = { fat: "#f5a4a4", taco: "#ef4d40", profiterole: "#71452e" };
+  rectangle(game.player, playerColors[game.player.power] ?? "#f5a4a4");
   if (game.player.power === "taco") {
     context.fillStyle = "#f6d365";
     context.fillRect(game.player.x + 4, game.player.y - 8, 36, 12);
@@ -50,7 +51,7 @@ function frame(time) {
   game.update(Math.min((time - previous) / 1000, 0.05), input());
   previous = time;
   draw();
-  requestAnimationFrame(frame);
+  if (!game.gameOver) requestAnimationFrame(frame);
 }
 
 requestAnimationFrame(frame);

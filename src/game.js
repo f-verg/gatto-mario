@@ -19,10 +19,12 @@ export class Game {
     this.projectiles = [];
     this.score = 0;
     this.gameOver = false;
+    this.invincible = 0;
   }
 
   update(dt, input = {}) {
     if (this.gameOver) return;
+    this.invincible = Math.max(0, this.invincible - dt);
     const player = this.player;
     player.vx = (input.left ? -220 : 0) + (input.right ? 220 : 0);
     if (player.vx) player.facing = Math.sign(player.vx);
@@ -44,7 +46,7 @@ export class Game {
       if (hit) this.score += 100;
       return !hit;
     });
-    if (this.enemies.some((enemy) => this.collides(player, enemy))) this.hurt();
+    if (!this.invincible && this.enemies.some((enemy) => this.collides(player, enemy))) this.hurt();
   }
 
   collect(item) {
@@ -81,6 +83,7 @@ export class Game {
     this.player.x = 100;
     this.player.y = GROUND - this.player.height;
     this.player.vy = 0;
+    this.invincible = 1;
   }
 
   collides(a, b) {
