@@ -23,7 +23,7 @@ document.querySelectorAll("[data-action]").forEach((button) => {
       pressed.add(action);
     }
   });
-  button.addEventListener("lostpointercapture", () => pressed.delete(action));
+  if (action !== "shoot") button.addEventListener("lostpointercapture", () => pressed.delete(action));
 });
 
 function input() {
